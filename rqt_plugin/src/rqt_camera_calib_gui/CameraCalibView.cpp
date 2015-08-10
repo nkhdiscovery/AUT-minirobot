@@ -79,9 +79,9 @@ int Currentz = -1;
 
 //TODO : change these for minirobot
 int slam_position_yaw[3] = {-1,-1,-1};
-int laser_IR[8] = {250,250,250,250,250,250,250,250};
-int s_Motor[4] = {128,128,128,128};
-int c_Motor[4] = {512,512,512,512};
+//int laser_IR[8] = {250,250,250,250,250,250,250,250};
+int s_Motor[3] = {128,128,128};
+int c_Motor[3] = {512,512,512};
 
 long basic_time;
 
@@ -99,7 +99,7 @@ CameraCalibView::CameraCalibView()
 }
 
 float ConvertQuatToYaw(const geometry_msgs::Quaternion &quat)
-
+{
     float yaw = tf::getYaw(quat);
     return isnan(yaw) ? 0 : yaw;
 }
@@ -421,52 +421,65 @@ void CameraCalibView::movex()
 
 void CameraCalibView::movey()
 {
+/*
     minirobot_msgs::command srv_command;
     srv_command.request.command ="movey";
     srv_command.request.value = ui.spin_movey->value();
     serviceclient_odometryslam.call(srv_command);
+*/
 }
 
 void CameraCalibView::turngl()
 {
+/*
     minirobot_msgs::command srv_command;
     srv_command.request.command ="turngl";
     srv_command.request.value = ui.spin_turngl->value();
     serviceclient_odometryslam.call(srv_command);
+*/
 }
 
 void CameraCalibView::turngllocal()
 {
+/*
     minirobot_msgs::command srv_command;
     srv_command.request.command ="turngllocal";
     srv_command.request.value = ui.spin_turngllocal->value();
     serviceclient_odometryslam.call(srv_command);
+*/
 }
 
 void CameraCalibView::odometrycancle()
 {
+/*
     minirobot_msgs::command srv_command;
     srv_command.request.command ="odometrycancle";
     serviceclient_odometryslam.call(srv_command);
+*/
 }
 
 void CameraCalibView::gotolocation()
 {
+/*
     minirobot_msgs::command srv_command;
     srv_command.request.command ="goto";
     srv_command.request.id = ui.txt_where->toPlainText().toStdString();
     serviceclient_odometryslam.call(srv_command);
+*/
 }
 
 void CameraCalibView::slamcancle()
 {
+/*
     minirobot_msgs::command srv_command;
     srv_command.request.command ="gotocancle";
     serviceclient_odometryslam.call(srv_command);
+*/
 }
 
 void CameraCalibView::point_add()
 {
+/*
     goal_data gdata;
     gdata.id = ui.txt_point_id->toPlainText().toStdString();
     gdata.x = ui.spin_point_x->value();
@@ -482,10 +495,12 @@ void CameraCalibView::point_add()
 
     point_save();
 
+*/
 }
 
 void CameraCalibView::point_addcurrent()
 {
+/*
 
     goal_data gdata;
     int size = goal_list.size();
@@ -506,10 +521,12 @@ void CameraCalibView::point_addcurrent()
     ui.list_points->addItem(strf);
 
     point_save();
+*/
 }
 
 void CameraCalibView::point_delete()
 {
+/*
 
     int index = ui.list_points->currentRow();
 
@@ -548,10 +565,12 @@ void CameraCalibView::point_delete()
     }
 
    point_save();
+*/
 }
 
 void CameraCalibView::point_edit()
 {
+/*
     int index = ui.list_points->currentRow();
 
     if ( index != -1 )
@@ -592,10 +611,12 @@ void CameraCalibView::point_edit()
     }
 
    point_save();
+*/
 }
 
 void CameraCalibView::point_selected()
 {
+/*
   int index = ui.list_points->currentRow();
 
   if ( index != -1 )
@@ -607,10 +628,12 @@ void CameraCalibView::point_selected()
       ui.spin_point_yaw->setValue(gdata.yaw);
 
   }
+*/
 }
 
 void CameraCalibView::point_save()
 {
+/*
 
   std::string path_points = ros::package::getPath("athomerobot") + "/points.txt";
   QString str = QString::fromUtf8(path_points.c_str());
@@ -634,10 +657,12 @@ void CameraCalibView::point_save()
 
 
       file.close();
+*/
 }
 
 void CameraCalibView::point_load()
 {
+/*
     std::string path_points = ros::package::getPath("athomerobot") + "/points.txt";
 
     QString str = QString::fromUtf8(path_points.c_str());
@@ -675,6 +700,7 @@ void CameraCalibView::point_load()
        }
 
        file.close();
+*/
 }
 
 void CameraCalibView::chatterCallback_log(const std_msgs::String::ConstPtr& msg)
@@ -813,6 +839,7 @@ void CameraCalibView::chatterCallback_omnispeed(const minirobot_msgs::omnidata::
 
 void CameraCalibView::chatterCallback_lasersensor(const minirobot_msgs::irsensor::ConstPtr &msg)
 {
+/*
     laser_IR[0] = (int)msg->d0;
     laser_IR[1] = (int)msg->d1;
     laser_IR[2] = (int)msg->d2;
@@ -821,6 +848,7 @@ void CameraCalibView::chatterCallback_lasersensor(const minirobot_msgs::irsensor
     laser_IR[5] = (int)msg->d5;
     laser_IR[6] = (int)msg->d6;
     laser_IR[7] = (int)msg->d7;
+*/
 }
 
 void CameraCalibView::chatterCallback_pose(const geometry_msgs::PoseStamped::ConstPtr &msg)
@@ -860,7 +888,7 @@ void CameraCalibView::basic_timer_update()
 
 void CameraCalibView::update()
 {
-
+/*
   ui.progress_laser1->setValue(laser_IR[0]);
   ui.progress_laser2->setValue(laser_IR[1]);
   ui.progress_laser3->setValue(laser_IR[2]);
@@ -869,19 +897,19 @@ void CameraCalibView::update()
   ui.progress_laser6->setValue(laser_IR[5]);
   ui.progress_laser7->setValue(laser_IR[6]);
   ui.progress_laser8->setValue(laser_IR[7]);
-
+*/
   ui.progress_speed1->setValue(s_Motor[0]);
   ui.progress_speed2->setValue(s_Motor[1]);
   ui.progress_speed3->setValue(s_Motor[2]);
-  ui.progress_speed4->setValue(s_Motor[3]);
+ // ui.progress_speed4->setValue(s_Motor[3]);
 
   ui.lcd_compass->display(Compass);
   ui.lcd_currentz->display(Currentz);
-
+/*
   ui.lcd_x->display(slam_position_yaw[0]);
   ui.lcd_y->display(slam_position_yaw[1]);
   ui.lcd_yaw->display(slam_position_yaw[2]);
-
+*/
   if ( ui.check_loop->isChecked() )
   {
       std_msgs::String msg;
