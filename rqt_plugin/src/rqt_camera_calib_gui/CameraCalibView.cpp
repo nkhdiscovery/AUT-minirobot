@@ -54,7 +54,7 @@ std::vector<goal_data> goal_list;
 
 int reset_kinect = 0;
 
-ros::Publisher chatter_pub1;
+ros::Publisher chatter_pub_omnidrive;
 ros::Publisher chatter_pub2;
 ros::Publisher chatter_pub3;
 ros::Publisher chatter_pub4;
@@ -117,9 +117,11 @@ inline float Rad2Deg(float rad)
 //TODO : check further use
 void CameraCalibView::process_init()
 {
-    sepanta_process_commands[0] = "roslaunch athomerobot laser.launch";
-    sepanta_process_commands[1] = "roslaunch openni_launch openni.launch";
-    sepanta_process_commands[2] = "roslaunch athomerobot motor.launch";
+    int commandsInUse = 3;
+    sepanta_process_commands[0] = "roslaunch dynamixel_tutorials controller_manager.launch";
+    sepanta_process_commands[1] = "roslaunch dynamixel_tutorials controller_spawner.launch";
+    sepanta_process_commands[2] = "rosrun minirobot minirobot";
+    /*
     sepanta_process_commands[3] = "rosrun athomerobot athomerobot";
     sepanta_process_commands[4] = "rosrun athomerobot odometry";
     sepanta_process_commands[5] = "rosrun athomerobot slam";
@@ -138,8 +140,8 @@ void CameraCalibView::process_init()
     sepanta_process_commands[18] = "rosrun athomerobot gesture";
     sepanta_process_commands[19] = "rosrun basic_function client_stop";
     sepanta_process_commands[20] = "rosrun basic_function basicFunction";
-
-    for ( int i = 0 ; i < 21 ; i++ )
+    */
+    for ( int i = 0 ; i < commandsInUse; i++ )
     {
         sepanta_process[i] = new QProcess(this);
     }
@@ -154,11 +156,11 @@ void CameraCalibView::rosImageCallBack(const sensor_msgs::ImageConstPtr &msg)
 void CameraCalibView::process_start(int id)
 {
 
-       //QString   prog  = "gnome-terminal";
-       //QStringList args;
-       //args << "-c" << "rosrun athomerobot athomerobot";
-       //sepanta_process[id]->start(prog, args);
-       //sepanta_process[id]->waitForFinished();
+       QString   prog  = "gnome-terminal";
+       QStringList args;
+       args << "-c" << sepanta_process_commands[id];
+       sepanta_process[id]->start(prog, args);
+       sepanta_process[id]->waitForFinished();
 
 }
 
@@ -176,7 +178,7 @@ void CameraCalibView::set_omni(int x,int y,int w)
  msg.d1 = y;
  msg.d2 = w;
 
- chatter_pub1.publish(msg);
+ chatter_pub_omnidrive.publish(msg);
 }
 
 void CameraCalibView::robot_forward()
@@ -245,22 +247,17 @@ void CameraCalibView::device_stop()
 
 void CameraCalibView::core_start()
 {
-/*
-    process_start(3);
-    process_start(4);
-    process_start(5);
-    process_start(6);
-*/ //TODO
+    process_start(0);
+    process_start(1);
+    process_start(2);
 }
 
 void CameraCalibView::core_stop()
 {
-/*
-    process_kill(3);
-    process_kill(4);
-    process_kill(5);
-    process_kill(6);
-*/
+    process_kill(0);
+    process_kill(1);
+    process_kill(2);
+
 }
 
 void CameraCalibView::map_start()
@@ -331,6 +328,7 @@ void CameraCalibView::kinect_watchdog()
    kinect_watchdogen = true;
 }
 
+/*
 //void CameraCalibView::pstart()
 //{
 
@@ -362,7 +360,7 @@ void CameraCalibView::kinect_watchdog()
 
 //        \
 //}
-
+*/
 void CameraCalibView::savemap()
 {
 /*
@@ -815,6 +813,7 @@ void CameraCalibView::right_gripopen()
     chatter_pub5.publish(msg);
 }
 
+//TODO
 void CameraCalibView::origin_update()
 {
     float ox = (float)ui.spin_x->value() / 100;
@@ -886,6 +885,7 @@ void CameraCalibView::basic_timer_update()
     basic_time++;
 }
 
+//TODO
 void CameraCalibView::update()
 {
 /*
@@ -1033,10 +1033,10 @@ void CameraCalibView::initPlugin(qt_gui_cpp::PluginContext& context)
 
     connect(ui.btn_device_start,SIGNAL(clicked()),this,SLOT(device_start()));
     connect(ui.btn_device_stop,SIGNAL(clicked()),this,SLOT(device_stop()));
-
+*/
     connect(ui.btn_core_start,SIGNAL(clicked()),this,SLOT(core_start()));
     connect(ui.btn_core_stop,SIGNAL(clicked()),this,SLOT(core_stop()));
-
+/*
     connect(ui.btn_map_start,SIGNAL(clicked()),this,SLOT(map_start()));
     connect(ui.btn_map_stop,SIGNAL(clicked()),this,SLOT(map_stop()));
 
@@ -1062,7 +1062,7 @@ void CameraCalibView::initPlugin(qt_gui_cpp::PluginContext& context)
     ros::NodeHandle n8;
     ros::NodeHandle n9;
 
-    chatter_pub1 = n1.advertise<minirobot_msgs::omnidata>("/AUTROBOTIN_omnidrive", 1);
+    chatter_pub_omnidrive = n1.advertise<minirobot_msgs::omnidata>("/AUTROBOTIN_omnidrive", 1);
     
 /*
     //chatter_pub2 = n2.advertise<geometry_msgs::PoseWithCovarianceStamped>("/slam_origin", 1);i
@@ -1110,10 +1110,8 @@ void CameraCalibView::initPlugin(qt_gui_cpp::PluginContext& context)
 
     //load point from HDD
     point_load();
-
-
-    //process_init();
 */
+    process_init();
 }
 
 void CameraCalibView::shutdownPlugin()
