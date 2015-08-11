@@ -206,6 +206,7 @@ private:
   ros::Subscriber sub_img;
 
   virtual void set_omni(int x,int y,int w);
+  virtual void set_motors(int m1,int m2,int m3);
   virtual void chatterCallback_compass(const std_msgs::Int32::ConstPtr& msg);
   virtual void chatterCallback_pose(const geometry_msgs::PoseStamped::ConstPtr &msg);
   virtual void chatterCallback_lasersensor(const minirobot_msgs::irsensor::ConstPtr &msg);

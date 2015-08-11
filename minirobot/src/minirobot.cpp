@@ -15,6 +15,7 @@
 #include "std_msgs/Int32.h"
 #include "std_msgs/String.h"
 #include "std_msgs/Bool.h"
+#include <minirobot_msgs/omnidata.h>
 
 #include <dynamixel_msgs/MotorStateList.h>
 #include <dynamixel_msgs/JointState.h>
@@ -25,6 +26,8 @@
 #include <boost/thread.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+
+
 
 //=============================================================
 
@@ -132,6 +135,24 @@ void init_motors()
  
 }
 
+void omniDrive(float vx, float vy,float w)
+{
+    g_Motor[0] = -sin(Deg2Rad(60)) * vx + cos(Deg2Rad(60)) * vy + w;
+    g_Motor[1] = -sin(Deg2Rad(180)) * vx + cos(Deg2Rad(180)) * vy + w;
+    g_Motor[2] = -sin(Deg2Rad(300)) * vx + cos(Deg2Rad(300)) * vy + w;
+    for (int i=0 ; i < 3; i++)
+    {
+        if ( g_Motor[i] < -1000 ) g_Motor[i] = -1000;
+        if ( g_Motor[i] > 1000 ) g_Motor[i] = 1000;
+    }
+
+}
+void chatterCallback_omnidrive(const minirobot_msgs::omnidata::ConstPtr &msg)
+{
+    omniDrive(msg->d0, msg->d1, msg->d2);
+}
+
+
 int main(int argc, char **argv)
 {
     g_Motor[0] = 0;  //m1
@@ -149,11 +170,13 @@ int main(int argc, char **argv)
 
 
     sub_handles[0] = node_handles[1].subscribe("/motor_states/pan_tilt_port", 10, chatterCallbackw);
+
+
     //============================================================================================
     chatter_pub_motor[0] = node_handles[2].advertise<std_msgs::Int32>("/m1_controller/command", 10);
     chatter_pub_motor[1] = node_handles[3].advertise<std_msgs::Int32>("/m2_controller/command", 10);
     chatter_pub_motor[2] = node_handles[4].advertise<std_msgs::Int32>("/m3_controller/command", 10);
-
+    sub_handles[1] = node_handles[5].subscribe("AUTROBOTIN_omnidrive", 10, chatterCallback_omnidrive);
     ros::Rate loop_rate(20);
 
     while (ros::ok() && App_exit == false)

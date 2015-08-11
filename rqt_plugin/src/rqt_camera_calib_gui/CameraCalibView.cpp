@@ -54,10 +54,12 @@ std::vector<goal_data> goal_list;
 
 int reset_kinect = 0;
 
+ros::Publisher chatter_pub_motor1;
+ros::Publisher chatter_pub_motor2;
+ros::Publisher chatter_pub_motor3;
 ros::Publisher chatter_pub_omnidrive;
-ros::Publisher chatter_pub2;
-ros::Publisher chatter_pub3;
-ros::Publisher chatter_pub4;
+
+
 ros::Publisher chatter_pub5;
 ros::Publisher chatter_pub6;
 ros::Publisher chatter_pub7;
@@ -70,8 +72,8 @@ ros::Publisher chatter_pub9;
 //ros::ServiceClient serviceclient_map;
 
 
-int speedx = 150;
-int speedy = 150;
+int speedx = 100;
+int speedy = 100;
 int speedt = -100;
 
 int Compass = -1;
@@ -97,7 +99,6 @@ CameraCalibView::CameraCalibView()
 {
 	setObjectName("CameraCalibView");
 }
-
 float ConvertQuatToYaw(const geometry_msgs::Quaternion &quat)
 {
     float yaw = tf::getYaw(quat);
@@ -155,13 +156,13 @@ void CameraCalibView::rosImageCallBack(const sensor_msgs::ImageConstPtr &msg)
 
 void CameraCalibView::process_start(int id)
 {
-
+    /*
        QString   prog  = "gnome-terminal";
        QStringList args;
-       args << "-c" << sepanta_process_commands[id];
+       args << "";//<< " -c " << sepanta_process_commands[id];
        sepanta_process[id]->start(prog, args);
        sepanta_process[id]->waitForFinished();
-
+       */
 }
 
 void CameraCalibView::process_kill(int id)
@@ -171,49 +172,60 @@ void CameraCalibView::process_kill(int id)
 
 }
 
-void CameraCalibView::set_omni(int x,int y,int w)
+void CameraCalibView::set_omni(int vx,int vy,int w)
 {
- minirobot_msgs::omnidata msg;
- msg.d0 = x;
- msg.d1 = y;
- msg.d2 = w;
+    minirobot_msgs::omnidata msg;
+    msg.d0 = vx;
+    msg.d1 = vy;
+    msg.d2 = w;
+    chatter_pub_omnidrive.publish(msg);
 
- chatter_pub_omnidrive.publish(msg);
+}
+
+void CameraCalibView::set_motors(int m1,int m2,int m3)
+{
+    std_msgs::Int32 msg1, msg2, msg3;
+    msg1.data = m1;
+    msg2.data = m2;
+    msg3.data = m3;
+    chatter_pub_motor1.publish(msg1);
+    chatter_pub_motor2.publish(msg2);
+    chatter_pub_motor3.publish(msg3);
 }
 
 void CameraCalibView::robot_forward()
 {
-    CameraCalibView::set_omni(speedx,0,0);
+    CameraCalibView::set_motors(-100,100,0);
 }
 
 void CameraCalibView::robot_backward()
 {
-    CameraCalibView::set_omni(-speedx,0,0);
+    CameraCalibView::set_motors(100,-100,0);
 }
 
 void CameraCalibView::robot_left()
 {
-    CameraCalibView::set_omni(0,speedy,0);
+    CameraCalibView::set_motors(0,speedy,0);
 }
 
 void CameraCalibView::robot_right()
 {
-    CameraCalibView::set_omni(0,-speedy,0);
+    CameraCalibView::set_motors(0,-speedy,0);
 }
 
 void CameraCalibView::robot_turn_left()
 {
-   CameraCalibView::set_omni(0,0,speedt);
+   CameraCalibView::set_motors(0,0,speedt);
 }
 
 void CameraCalibView::robot_turn_right()
 {
-   CameraCalibView::set_omni(0,0,-speedt);
+   CameraCalibView::set_motors(0,0,-speedt);
 }
 
 void CameraCalibView::robot_stop()
 {
-   CameraCalibView::set_omni(0,0,0);
+   CameraCalibView::set_motors(0,0,0);
 }
 
 
@@ -247,17 +259,20 @@ void CameraCalibView::device_stop()
 
 void CameraCalibView::core_start()
 {
+    /*
     process_start(0);
     process_start(1);
     process_start(2);
+    */
 }
 
 void CameraCalibView::core_stop()
 {
+    /*
     process_kill(0);
     process_kill(1);
     process_kill(2);
-
+*/
 }
 
 void CameraCalibView::map_start()
@@ -409,6 +424,8 @@ void CameraCalibView::manualreached()
 
 void CameraCalibView::movex()
 {
+    int vx = ui.spin_movex->value() , vy = ui.spin_movey->value(), w = ui.spin_turngl->value();
+    set_omni(vx, vy, w);
 /*
 	minirobot_msgs::command srv_command;
     srv_command.request.command ="movex";
@@ -734,7 +751,7 @@ void CameraCalibView::reset()
 {
     std_msgs::String msg;
     msg.data = "reset";
-    chatter_pub3.publish(msg);
+    chatter_pub_motor2.publish(msg);
 }
 
 void CameraCalibView::left_arm_update()
@@ -784,7 +801,7 @@ void CameraCalibView::right_arm_update()
     arm_msg.wrist_pitch = ui.spin_right_wristPitch->value();
     arm_msg.wrist_roll = ui.spin_right_wristRoll->value();
 
-    chatter_pub4.publish(arm_msg);
+    chatter_pub_motor3.publish(arm_msg);
 }
 
 void CameraCalibView::right_arm_reset()
@@ -796,7 +813,7 @@ void CameraCalibView::right_arm_reset()
     arm_msg.wrist_pitch = 2048;
     arm_msg.wrist_roll = 2048;
 
-    chatter_pub4.publish(arm_msg);
+    chatter_pub_motor3.publish(arm_msg);
 }
 
 void CameraCalibView::right_gripclose()
@@ -826,7 +843,7 @@ void CameraCalibView::origin_update()
     msg.pose.pose.position.x = ox;
     msg.pose.pose.position.y = oy;
 
-    chatter_pub2.publish(msg);
+    chatter_pub_motor1.publish(msg);
 }
 
 void CameraCalibView::chatterCallback_omnispeed(const minirobot_msgs::omnidata::ConstPtr &msg)
@@ -915,7 +932,7 @@ void CameraCalibView::update()
       std_msgs::String msg;
       msg.data = "reset";
 
-      chatter_pub3.publish(msg);
+      chatter_pub_motor2.publish(msg);
   }
 
   if ( kinect_watchdogen == true )
@@ -1063,11 +1080,15 @@ void CameraCalibView::initPlugin(qt_gui_cpp::PluginContext& context)
     ros::NodeHandle n9;
 
     chatter_pub_omnidrive = n1.advertise<minirobot_msgs::omnidata>("/AUTROBOTIN_omnidrive", 1);
+    chatter_pub_motor1 = n2.advertise<std_msgs::Int32>("/m1_controller/command", 10);
+    chatter_pub_motor2 = n3.advertise<std_msgs::Int32>("/m2_controller/command", 10);
+    chatter_pub_motor3 = n4.advertise<std_msgs::Int32>("/m3_controller/command", 10);
+
     
 /*
-    //chatter_pub2 = n2.advertise<geometry_msgs::PoseWithCovarianceStamped>("/slam_origin", 1);i
-    //chatter_pub3 = n3.advertise<std_msgs::String>("/syscommand", 1);
-    //chatter_pub4 = n4.advertise<minirobot_msgs::arm>("/AUTROBOTIN_arm_right", 1);
+    //chatter_pub_motor1 = n2.advertise<geometry_msgs::PoseWithCovarianceStamped>("/slam_origin", 1);i
+    //chatter_pub_motor2 = n3.advertise<std_msgs::String>("/syscommand", 1);
+    //chatter_pub_motor3 = n4.advertise<minirobot_msgs::arm>("/AUTROBOTIN_arm_right", 1);
     chatter_pub5 = n5.advertise<std_msgs::Int32>("AUTROBOTIN_gripper_right", 1); //grip right
     chatter_pub6 = n6.advertise<minirobot_msgs::arm>("/AUTROBOTIN_arm_left", 1);
     chatter_pub7 = n7.advertise<std_msgs::Int32>("AUTROBOTIN_gripper_left", 1); //grip left
