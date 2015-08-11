@@ -195,32 +195,38 @@ void CameraCalibView::set_motors(int m1,int m2,int m3)
 
 void CameraCalibView::robot_forward()
 {
-    CameraCalibView::set_motors(-100,100,0);
+    int speed = ui.spin_turngllocal->value();
+    CameraCalibView::set_omni(0,speed,0);
 }
 
 void CameraCalibView::robot_backward()
 {
-    CameraCalibView::set_motors(100,-100,0);
+    int speed = ui.spin_turngllocal->value();
+    CameraCalibView::set_omni(0,-speed,0);
 }
 
 void CameraCalibView::robot_left()
 {
-    CameraCalibView::set_motors(0,speedy,0);
+    int speed = ui.spin_turngllocal->value();
+    CameraCalibView::set_omni(-speed,0,0);
 }
 
 void CameraCalibView::robot_right()
 {
-    CameraCalibView::set_motors(0,-speedy,0);
+    int speed = ui.spin_turngllocal->value();
+    CameraCalibView::set_omni(speed,0,0);
 }
 
 void CameraCalibView::robot_turn_left()
 {
-   CameraCalibView::set_motors(0,0,speedt);
+    int speed = ui.spin_turngllocal->value();
+   CameraCalibView::set_omni(0,0,speed);
 }
 
 void CameraCalibView::robot_turn_right()
 {
-   CameraCalibView::set_motors(0,0,-speedt);
+    int speed = ui.spin_turngllocal->value();
+   CameraCalibView::set_omni(0,0,-speed);
 }
 
 void CameraCalibView::robot_stop()
@@ -466,6 +472,8 @@ void CameraCalibView::turngllocal()
 
 void CameraCalibView::odometrycancle()
 {
+    set_omni(0,0,0);
+    set_motors(0,0,0); // :D
 /*
     minirobot_msgs::command srv_command;
     srv_command.request.command ="odometrycancle";
@@ -1003,12 +1011,15 @@ void CameraCalibView::initPlugin(qt_gui_cpp::PluginContext& context)
     connect(ui.btn_manualmode,SIGNAL(clicked()),this,SLOT(manualmode()));
     connect(ui.btn_automode,SIGNAL(clicked()),this,SLOT(automode()));
     connect(ui.btn_manualreached,SIGNAL(clicked()),this,SLOT(manualreached()));
+*/
 
     connect(ui.btn_movex,SIGNAL(clicked()),this,SLOT(movex()));
+    connect(ui.btn_odometry_cancle,SIGNAL(clicked()),this,SLOT(odometrycancle()));
+/*
     connect(ui.btn_movey,SIGNAL(clicked()),this,SLOT(movey()));
     connect(ui.btn_btnturngl,SIGNAL(clicked()),this,SLOT(turngl()));
     connect(ui.btn_btnturngllocal,SIGNAL(clicked()),this,SLOT(turngllocal()));
-    connect(ui.btn_odometry_cancle,SIGNAL(clicked()),this,SLOT(odometrycancle()));
+
 
     connect(ui.btn_goto,SIGNAL(clicked()),this,SLOT(gotolocation()));
     connect(ui.btn_slam_cancle,SIGNAL(clicked()),this,SLOT(slamcancle()));

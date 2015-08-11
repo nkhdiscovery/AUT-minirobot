@@ -6,7 +6,7 @@
             namespace: dxl_manager
             serial_ports:
                 pan_tilt_port:
-                    port_name: "/dev/serial/by-id/usb-FTDI_USBzDXL_A5WQGULH-if00-port0"
+                    port_name: "/dev/serial/by-id/usb-FTDI_USBzDXL_A5WQBL8V-if00-port0"
                     baud_rate: 1000000
                     min_motor_id: 1
                     max_motor_id: 110

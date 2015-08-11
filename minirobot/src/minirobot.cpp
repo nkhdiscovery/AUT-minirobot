@@ -66,10 +66,14 @@ int state = 0 ;
 
 void logic()
 {
-    boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
     cout << "MINI ROBOT CORE STARTED DONE V1" << endl;
+    /*
+    boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+
+
     while (App_exit == false)
     {
+
     	if ( state == 0 )
     	{
     		g_Motor[0] = 100;
@@ -94,6 +98,7 @@ void logic()
 
         boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
     }
+*/
 }
 
 void chatterCallbackw(const dynamixel_msgs::MotorStateList::ConstPtr &msg)
